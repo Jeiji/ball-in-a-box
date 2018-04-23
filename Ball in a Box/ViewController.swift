@@ -124,14 +124,12 @@ class ViewController: UIViewController, ballDelegate {
         
         /////////////////////////////////
         //                             //
-        // MARK: Motion Managers/Loops //
+        // MARK: The Loop              //
         //                             //
         /////////////////////////////////
         
         precondition( MM.isMagnetometerAvailable && MM.isAccelerometerAvailable, "Not all motion captures available on this device." )
         
-        
-        // MARK: The Loop
         let deviceMotionHandler: CMDeviceMotionHandler = { motionData , error in
             
             if let md = motionData {
@@ -153,7 +151,7 @@ class ViewController: UIViewController, ballDelegate {
                 let bbe = CGPoint(x:(bc.x),y:(bc.y+(bh/2)))
                 
                 
-                // MARK: Colision Checks
+                // MARK: Screen Edge Colision Checks
                 
                 //Left/Right Collision
                 if ( ble.x <= vle || bre.x >= vre || ( ble.x + CGFloat(theBall.speedX) ) <= vle || ( bre.x + CGFloat(theBall.speedX) ) >= vre   ){
@@ -168,6 +166,8 @@ class ViewController: UIViewController, ballDelegate {
                 }
                 if ( bte.y < vte ){self.ball.frame.origin.y = vte}
                 if ( bbe.y > vbe ){self.ball.frame.origin.y = vbe-bh}
+                
+                // MARK: Other Ball Collision
                 
                 
                 
