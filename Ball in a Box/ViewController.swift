@@ -267,6 +267,8 @@ class ViewController: UIViewController, ballDelegate {
 
                                     interactionSlope = ( otherBallCenterY - ballCenterY ) / ( otherBallCenterX - ballCenterX )
                                     refractionSlope = 1/interactionSlope!
+                                    
+                                    let interactionAngle = atan(interactionSlope)
 
                                     print("\nRefraction Slope: \(String(describing: refractionSlope?.toDecimal(decimalPlaces: self.universalDecimalPlace)))")
 
@@ -286,7 +288,7 @@ class ViewController: UIViewController, ballDelegate {
                                     
                                     // Wikipedia'd Newtonian method
                                     
-                                    ballNewSpeed.x = ( ballAbsoluteSpeed*( cos(ballSlope) ) )
+                                    ballNewSpeed.x =  ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) 
                                     
                                     
 
