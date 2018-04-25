@@ -173,7 +173,7 @@ class ViewController: UIViewController, ballDelegate {
         //                             //
         /////////////////////////////////
         
-        let theBall = makeAndPresentBallConfluence(radius: 150, delegate: self)
+        let _ = makeAndPresentBallConfluence(radius: 150, delegate: self)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
             _ = self.makeAndPresentBallConfluence(radius: 150, delegate: self)
@@ -243,82 +243,105 @@ class ViewController: UIViewController, ballDelegate {
                     
                     //MARK: Inter-Ball Collision
                     
-                    //                    for otherBall in self.balls {
-                    //                        if otherBall === ball {
-                    //                            continue
-                    //                        }else{
-                    //                            if otherBall.view.frame.intersects(ball.view.frame){
-                    //
-                    //                                print("\n\n*** INTERSECTION! Calculating slope and reflections...\n\n")
-                    //
-                    //
-                    //
-                    //                                // Set up the interaction slope, the collision angle is required first...
-                    //
-                    //                                //Setting collision angle
-                    //                                if let ballCenterX = ball.ball.center?.x , let ballCenterY = ball.ball.center?.y , let otherBallCenterX = otherBall.ball.center?.x , let otherBallCenterY = otherBall.ball.center?.y {
-                    //
-                    //                                    let ballspeedX = ball.ball.speed.x
-                    //                                    let ballspeedY = ball.ball.speed.y
-                    //                                    let otherBallspeedX = otherBall.ball.speed.x
-                    //                                    let otherBallspeedY = otherBall.ball.speed.y
-                    //                                    let interactionSlope: CGFloat?
-                    //                                    let refractionSlope: CGFloat?
-                    //
-                    //                                    interactionSlope = ( otherBallCenterY - ballCenterY ) / ( otherBallCenterX - ballCenterX )
-                    //                                    refractionSlope = 1/interactionSlope!
-                    //
-                    //                                    print("\nRefraction Slope: \(String(describing: refractionSlope?.toDecimal(decimalPlaces: self.universalDecimalPlace)))")
-                    //
-                    //                                    let ballAbsoluteSpeed = CGFloat( ballspeedX + ballspeedY )
-                    //                                    let otherBallAbsoluteSpeed = CGFloat( otherBallspeedX + otherBallspeedY )
-                    //
-                    //                                    let ballNewSpeed: ( x: Double , y: Double )
-                    //                                    let otherBallNewSpeed : ( x: Double , y: Double )
-                    //
-                    //                                    // Transfer of energy...-ish...
-                    //                                    let ballTransferSpeed = ballAbsoluteSpeed * refractionSlope!
-                    //                                    let otherBallTransferSpeed = otherBallAbsoluteSpeed * refractionSlope!
-                    //                                    let ballRemainingSpeed = ballAbsoluteSpeed - ballTransferSpeed
-                    //                                    let otherBallRemainingSpeed = otherBallAbsoluteSpeed - otherBallTransferSpeed
-                    //                                    let ballNewAbsoluteSpeed = ballRemainingSpeed + otherBallTransferSpeed
-                    //                                    let otherBallNewAbsoluteSpeed = otherBallRemainingSpeed + ballTransferSpeed
-                    //
-                    //                                    //Finding new post-collision slopes
-                    //                                    let ballSlope = ballspeedY / ballspeedX
-                    //                                    let otherBallSlope = otherBallspeedY / otherBallspeedX
-                    //
-                    //                                    print("BALL SLOPE: \(ballSlope.toDecimal(decimalPlaces: self.universalDecimalPlace))\nOTHER BALL SLOPE: \(otherBallSlope.toDecimal(decimalPlaces: self.universalDecimalPlace))")
-                    //
-                    //                                    let ballRefractionDifference = 0 - refractionSlope!
-                    //                                    let ballTempSlope = CGFloat(ballSlope) - ballRefractionDifference
-                    //                                    let ballTempRefraction = -ballTempSlope
-                    //                                    let ballNewRefraction = ballTempRefraction + ballRefractionDifference
-                    //
-                    //                                    let otherBallTempSlope = CGFloat(otherBallSlope) - ballRefractionDifference
-                    //                                    let otherBallTempRefraction = -otherBallTempSlope
-                    //                                    let otherBallNewRefraction = otherBallTempRefraction + ballRefractionDifference
-                    //
-                    //                                    //Apply speeds to refraction angles
-                    //                                    ballNewSpeed.x = Double(( ballNewAbsoluteSpeed/ballNewRefraction ) / 2)
-                    //                                    ballNewSpeed.y = ( Double(ballNewAbsoluteSpeed) - ballNewSpeed.x )
-                    //
-                    //                                    otherBallNewSpeed.x = Double(( otherBallNewAbsoluteSpeed/otherBallNewRefraction ) / 2)
-                    //                                    otherBallNewSpeed.y = ( Double(otherBallNewAbsoluteSpeed) - otherBallNewSpeed.x )
-                    //
-                    //                                    ball.ball.speed = ballNewSpeed
-                    //                                    otherBall.ball.speed = otherBallNewSpeed
-                    //
-                    //
-                    //                                }else{
-                    //                                    print("Ball centers returned nil for some reason.")
-                    //                                }
-                    //
-                    //
-                    //
-                    //                            }
-                    //                        }
-                    //                    }
+                    for otherBall in self.balls {
+                        if otherBall === ball {
+                            continue
+                        }else{
+                            if otherBall.view.frame.intersects(ball.view.frame){
+
+                                print("\n\n*** INTERSECTION! Calculating slope and reflections...\n\n")
+
+
+
+                                // Set up the interaction slope, the collision angle is required first...
+
+                                //Setting collision angle
+                                if let ballCenterX = ball.ball.center?.x , let ballCenterY = ball.ball.center?.y , let otherBallCenterX = otherBall.ball.center?.x , let otherBallCenterY = otherBall.ball.center?.y {
+
+                                    let ballspeedX = ball.ball.speed.x
+                                    let ballspeedY = ball.ball.speed.y
+                                    let otherBallspeedX = otherBall.ball.speed.x
+                                    let otherBallspeedY = otherBall.ball.speed.y
+                                    let interactionSlope: CGFloat?
+                                    let refractionSlope: CGFloat?
+
+                                    interactionSlope = ( otherBallCenterY - ballCenterY ) / ( otherBallCenterX - ballCenterX )
+                                    refractionSlope = 1/interactionSlope!
+
+                                    print("\nRefraction Slope: \(String(describing: refractionSlope?.toDecimal(decimalPlaces: self.universalDecimalPlace)))")
+
+                                    let ballAbsoluteSpeed = CGFloat( abs(ballspeedX + ballspeedY) )
+                                    let otherBallAbsoluteSpeed = CGFloat( abs(otherBallspeedX + otherBallspeedY) )
+                                    
+                                    print("BALL ABSOLUTE SPEED: \(ballAbsoluteSpeed.toDecimal(decimalPlaces: self.universalDecimalPlace))\nOTHER BALL ABSOLUTE SPEED: \(otherBallAbsoluteSpeed.toDecimal(decimalPlaces: self.universalDecimalPlace))")
+                                    
+                                    let ballNewSpeed: ( x: Double , y: Double )
+                                    let otherBallNewSpeed : ( x: Double , y: Double )
+                                    
+                                    //Finding new post-collision slopes
+                                    let ballSlope = CGFloat(ballspeedY / ballspeedX)
+                                    let ballSlopeInDegrees = atan(ballSlope)
+                                    let otherBallSlope = CGFloat(otherBallspeedY / otherBallspeedX)
+                                    let otherBallSlopeInDegrees = atan(otherBallSlope)
+                                    
+                                    // Wikipedia'd Newtonian method
+                                    
+                                    ballNewSpeed.x = ( ballAbsoluteSpeed*( cos(ballSlope) ) )
+                                    
+                                    
+
+//                                    // Transfer of energy...-ish...
+//                                    let ballTransferSpeed = ballAbsoluteSpeed * refractionSlope!
+//                                    let otherBallTransferSpeed = otherBallAbsoluteSpeed * refractionSlope!
+//                                    let ballRemainingSpeed = ballAbsoluteSpeed - ballTransferSpeed
+//                                    let otherBallRemainingSpeed = otherBallAbsoluteSpeed - otherBallTransferSpeed
+//                                    let ballNewAbsoluteSpeed = ballRemainingSpeed + otherBallTransferSpeed
+//                                    let otherBallNewAbsoluteSpeed = otherBallRemainingSpeed + ballTransferSpeed
+//
+//                                    //Finding new post-collision slopes
+//                                    let ballSlope = CGFloat(ballspeedY / ballspeedX)
+//                                    let otherBallSlope = CGFloat(otherBallspeedY / otherBallspeedX)
+//
+////                                    guard !ballSlope.isSignalingNaN && otherBallSlope.isSignalingNaN else{
+////                                        print(ballSlope.isSignalingNaN)
+////                                        print(otherBallSlope.isSignalingNaN)
+////                                        break
+////                                    }
+////
+////                                    print("BALL SLOPE: \(ballSlope.toDecimal(decimalPlaces: self.universalDecimalPlace))\nOTHER BALL SLOPE: \(otherBallSlope.toDecimal(decimalPlaces: self.universalDecimalPlace))")
+//
+//
+//
+//
+//                                    let ballRefractionDifference = refractionSlope!
+//                                    let ballTempSlope = CGFloat(ballSlope) - ballRefractionDifference
+//                                    let ballTempRefraction = -ballTempSlope
+//                                    let ballNewRefraction = ballTempRefraction + ballRefractionDifference
+//
+//                                    let otherBallTempSlope = CGFloat(otherBallSlope) - ballRefractionDifference
+//                                    let otherBallTempRefraction = -otherBallTempSlope
+//                                    let otherBallNewRefraction = otherBallTempRefraction + ballRefractionDifference
+//
+//                                    //Apply speeds to refraction angles
+//                                    ballNewSpeed.x = Double(( ballNewAbsoluteSpeed/ballNewRefraction ) / 2)
+//                                    ballNewSpeed.y = ( Double(ballNewAbsoluteSpeed) - ballNewSpeed.x )
+//
+//                                    otherBallNewSpeed.x = Double(( otherBallNewAbsoluteSpeed/otherBallNewRefraction ) / 2)
+//                                    otherBallNewSpeed.y = ( Double(otherBallNewAbsoluteSpeed) - otherBallNewSpeed.x )
+//
+                                    ball.ball.speed = ballNewSpeed
+                                    otherBall.ball.speed = otherBallNewSpeed
+
+
+                                }else{
+                                    print("Ball centers returned nil for some reason.")
+                                }
+
+
+
+                            }
+                        }
+                    }
                     
                     
                     
