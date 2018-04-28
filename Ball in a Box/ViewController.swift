@@ -94,6 +94,7 @@ class ViewController: UIViewController, ballDelegate {
         }
         var ball : Ball
         var view : UIView
+        var collidingWith : BallConflux?
     }
     
     enum GravityFactor : Double {
@@ -181,7 +182,7 @@ class ViewController: UIViewController, ballDelegate {
         })
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
-//            _ = self.makeAndPresentBallConfluence(radius: 50, delegate: self)
+//            _ = self.makeAndPresentBallConfluence(radius: 50, delegate: self , color: .blue)
 //        })
 //
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0, execute: {
@@ -255,10 +256,24 @@ class ViewController: UIViewController, ballDelegate {
                     for otherBall in self.balls {
                         if otherBall === ball {
                             continue
+                        }else if ball.collidingWith === otherBall {
+                            continue
                         }else{
-                            if otherBall.view.frame.intersects(ball.view.frame){
+                            
+                            otherBall.collidingWith = ball
+                            ball.collidingWith = otherBall
+                            
+                            let distanceX = Double((ball.ball.center?.x)! - (otherBall.ball.center?.x)!)
+                            let lastDistanceX = (Double((ball.ball.center?.x)!) - ball.ball.speed.x) - (Double((otherBall.ball.center?.x)!) - otherBall.ball.speed.x)
+                            let distanceY = Double((ball.ball.center?.y)! - (otherBall.ball.center?.y)!)
+                            let lastDistanceY = (Double((ball.ball.center?.y)!) - ball.ball.speed.y) - (Double((otherBall.ball.center?.y)!) - otherBall.ball.speed.y)
+                            let totalDistance = sqrt((distanceX * distanceX) + (distanceY * distanceY))
+                            let lastTotalDistance = sqrt((lastDistanceX * lastDistanceX) + (lastDistanceY * lastDistanceY))
+                            
 
-                                print("\n\n*** INTERSECTION! Calculating slope and reflections...\n\n")
+                            
+                            if totalDistance < ball.ball.radius! + otherBall.ball.radius! && ( lastTotalDistance > totalDistance ) && ( lastTotalDistance > ball.ball.radius! + otherBall.ball.radius! ){
+                                
 
 
 
@@ -274,39 +289,64 @@ class ViewController: UIViewController, ballDelegate {
                                     let interactionSlope: CGFloat?
                                     let refractionSlope: CGFloat?
 
-                                    interactionSlope = ( otherBallCenterY - ballCenterY ) / ( otherBallCenterX - ballCenterX )
+                                    interactionSlope = ( ballCenterY - otherBallCenterY ) / ( ballCenterX - otherBallCenterX )
                                     refractionSlope = 1/interactionSlope!
                                     
-                                    let interactionAngle = atan(interactionSlope!)
+                                    var interactionAngle = atan(interactionSlope!) * ( 180 / .pi )
+                                    
+                                    if interactionAngle <= -90 { interactionAngle += 180 }
 
-                                    print("\nRefraction Slope: \(String(describing: refractionSlope?.toDecimal(decimalPlaces: self.universalDecimalPlace)))")
+                                    
+                                    print("\n\nInteraction Angle: \(String(describing: interactionAngle.toDecimal(decimalPlaces: self.universalDecimalPlace)))")
+
 
                                     let ballAbsoluteSpeed = CGFloat( abs(ballspeedX) + abs(ballspeedY) )
                                     let otherBallAbsoluteSpeed = CGFloat( abs(otherBallspeedX) + abs(otherBallspeedY) )
                                     
-                                    print("BALL ABSOLUTE SPEED: \(ballAbsoluteSpeed.toDecimal(decimalPlaces: self.universalDecimalPlace))\nOTHER BALL ABSOLUTE SPEED: \(otherBallAbsoluteSpeed.toDecimal(decimalPlaces: self.universalDecimalPlace))")
+                                    print("Ball Velocity: ( \(ballspeedX.toDecimal(decimalPlaces: self.universalDecimalPlace)) , \(ballspeedY.toDecimal(decimalPlaces: self.universalDecimalPlace)) )\nOther Ball Velocity: ( \(otherBallspeedX.toDecimal(decimalPlaces: self.universalDecimalPlace)) , \(otherBallspeedY.toDecimal(decimalPlaces: self.universalDecimalPlace)) )")
                                     
                                     let ballNewSpeed: ( x: Double , y: Double )
                                     let otherBallNewSpeed : ( x: Double , y: Double )
                                     
                                     //Finding new post-collision slopes
                                     let ballSlope = CGFloat(ballspeedY / ballspeedX)
-                                    let ballSlopeInDegrees = atan(ballSlope) * ( 180 / .pi )
+                                    var ballSlopeInDegrees = atan(ballSlope) * ( 180 / .pi )
+                                    if ballSlopeInDegrees <= -90 { ballSlopeInDegrees += 180 }
                                     let otherBallSlope = CGFloat(otherBallspeedY / otherBallspeedX)
-                                    let otherBallSlopeInDegrees = atan(otherBallSlope) * ( 180 / .pi )
+                                    var otherBallSlopeInDegrees = atan(otherBallSlope) * ( 180 / .pi )
+                                    if otherBallSlopeInDegrees  <= -90 { otherBallSlopeInDegrees += 180 }
+                                    
+                                    print("BALL Angle: \(ballSlopeInDegrees.toDecimal(decimalPlaces: self.universalDecimalPlace))\nOTHER BALL Angle: \(otherBallSlopeInDegrees.toDecimal(decimalPlaces: self.universalDecimalPlace))")
+                                    
+                                    
+                                    //To lessen overlap...
+                                    
+//                                    if totalDistance < ball.ball.radius! + otherBall.ball.radius! {
+//                                        if ( Double((ball.ball.center?.x)!) < Double((otherBall.ball.center?.x)!) ){
+//                                            ball.view.center.x -= CGFloat(( ball.ball.radius! + otherBall.ball.radius! ) - distanceX)
+//                                        }else{
+//                                            ball.view.center.x -= CGFloat(( ball.ball.radius! + otherBall.ball.radius! ) - distanceX)
+//                                        }
+//                                    }
+
+                                    
+                                    
+                                    
                                     
                                     // Wikipedia'd Newtonian method
                                     
-                                    print(ballSlopeInDegrees)
+                                    let mitigation:Double = 0.5
                                     
-                                    ballNewSpeed.x =  Double((  (( ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) + ( 2 * otherBallAbsoluteSpeed * ( otherBallSlopeInDegrees - interactionAngle ))) / 2 ) * ( cos( interactionAngle ) - ballAbsoluteSpeed * sin( ballSlopeInDegrees - interactionAngle ) * sin( interactionAngle ) )  )) * BounceFactor.bhalf.rawValue
                                     
-                                    ballNewSpeed.y =  Double( (  (( ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) + ( 2 * otherBallAbsoluteSpeed * ( otherBallSlopeInDegrees - interactionAngle ))) / 2 ) * ( sin( interactionAngle ) + ballAbsoluteSpeed * sin( ballSlopeInDegrees - interactionAngle ) * cos( interactionAngle ) )  )) * BounceFactor.bhalf.rawValue
+                                    ballNewSpeed.x =  Double( ( ( ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) * ( 1 - 1 ) + 2 * 1 * otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) ) / 1 + 1 ) * cos( interactionAngle ) + ballAbsoluteSpeed * sin( ballSlopeInDegrees - interactionAngle ) * cos( interactionAngle + ( .pi / 2 ) ))
                                     
-                                    otherBallNewSpeed.x =  Double( (  (( otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) + ( 2 * ballAbsoluteSpeed * ( ballSlopeInDegrees - interactionAngle ))) / 2 ) * ( cos( interactionAngle ) - otherBallAbsoluteSpeed * sin( otherBallSlopeInDegrees - interactionAngle ) * sin( interactionAngle ) )  )) * BounceFactor.bhalf.rawValue
+                                    ballNewSpeed.y =  -Double( ( ( ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) * ( 1 - 1 ) + 2 * 1 * otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) ) / 1 + 1 ) * sin( interactionAngle ) + ballAbsoluteSpeed * sin( ballSlopeInDegrees - interactionAngle ) * sin( interactionAngle + ( .pi / 2 ) ))
                                     
-                                    otherBallNewSpeed.y =  Double( (  (( otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) + ( 2 * ballAbsoluteSpeed * ( ballSlopeInDegrees - interactionAngle ))) / 2 ) * ( sin( interactionAngle ) + otherBallAbsoluteSpeed * sin( otherBallSlopeInDegrees - interactionAngle ) * cos( interactionAngle ) )  )) * BounceFactor.bhalf.rawValue
                                     
+                                    otherBallNewSpeed.x =  Double( ( ( otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) * ( 1 - 1 ) + 2 * 1 * ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) ) / 1 + 1 ) * cos( interactionAngle ) + otherBallAbsoluteSpeed * sin( otherBallSlopeInDegrees - interactionAngle ) * cos( interactionAngle + ( .pi / 2 ) ))
+                                    
+                                    otherBallNewSpeed.y =  -Double( ( ( otherBallAbsoluteSpeed * cos( otherBallSlopeInDegrees - interactionAngle ) * ( 1 - 1 ) + 2 * 1 * ballAbsoluteSpeed * cos( ballSlopeInDegrees - interactionAngle ) ) / 1 + 1 ) * sin( interactionAngle ) + otherBallAbsoluteSpeed * sin( otherBallSlopeInDegrees - interactionAngle ) * sin( interactionAngle + ( .pi / 2 ) ))
+                            
                                     
 
 
@@ -354,6 +394,9 @@ class ViewController: UIViewController, ballDelegate {
                 else {
                     print("Couldn't get Motion Data")
                 }
+            }
+            for ball in self.balls {
+                ball.collidingWith = nil
             }
             
             
